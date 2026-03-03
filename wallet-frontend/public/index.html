@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="generator" content="Hugo 0.157.0"><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <title>HD Wallet Service</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #f1f5f9;
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .container {
+      width: 600px;
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    button {
+      padding: 10px 15px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 5px;
+      background: #3b82f6;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #2563eb;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: none;
+    }
+
+    pre {
+      background: #0f172a;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 15px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>HD Wallet Generator</h1>
+
+    <button onclick="generateMnemonic()">Generate Mnemonic</button>
+    <pre id="mnemonicOutput"></pre>
+
+    <input type="text" id="mnemonicInput" placeholder="Paste mnemonic here">
+    <input type="number" id="indexInput" placeholder="Wallet index (0,1,2...)" />
+
+    <button onclick="deriveWallet()">Derive Address</button>
+    <pre id="walletOutput"></pre>
+  </div>
+
+  <script>
+    async function generateMnemonic() {
+      const response = await fetch("http://localhost:8080/mnemonic", {
+        method: "POST"
+      });
+
+      const data = await response.json();
+      document.getElementById("mnemonicOutput").innerText = data.mnemonic;
+      document.getElementById("mnemonicInput").value = data.mnemonic;
+    }
+
+    async function deriveWallet() {
+      const mnemonic = document.getElementById("mnemonicInput").value;
+      const index = document.getElementById("indexInput").value;
+
+      const response = await fetch(
+        `http://localhost:8080/derive?mnemonic=${encodeURIComponent(mnemonic)}&index=${index}`
+      );
+
+      const data = await response.json();
+      document.getElementById("walletOutput").innerText = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>
